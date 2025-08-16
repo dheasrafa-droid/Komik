@@ -3,80 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Episode 1 – Action Hero</title>
+  <title>CCTA Filter Hub</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .panel {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    .panel h2 {
-      margin-top: 0;
-      color: #333;
-    }
-    .panel p {
-      text-align: justify;
-      line-height: 1.6;
-      color: #555;
-    }
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
+    header { background: #ff5e5e; color: #fff; padding: 20px; text-align: center; font-size: 2em; font-weight: bold; }
+    section.hero { text-align: center; padding: 50px 20px; background: #fff; }
+    button { padding: 10px 20px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    button.primary { background: #ff5e5e; color: #fff; }
+    .upload-area { border: 2px dashed #ccc; padding: 40px; border-radius: 10px; margin: 20px auto; width: 80%; text-align: center; background: #fff; }
+    #iconGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; padding: 20px; }
+    .icon-card { background: #fff; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; font-size: 2em; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); transition: 0.2s; }
+    .icon-card:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; overflow: auto; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 90%; overflow: auto; }
+    .close { float: right; cursor: pointer; font-weight: bold; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
   </style>
 </head>
 <body>
 
-<h1>Episode 1 – Action Hero</h1>
+  <header>CCTA Filter Hub</header>
 
-<div class="panel">
-  <h2>Panel 1</h2>
-  <p>Di kota metropolis yang dilanda kekacauan, Arka, seorang pemuda biasa, menyaksikan ledakan besar di pusat kota. Rasa takut dan penasaran bercampur, memicu instingnya untuk bertindak.</p>
-</div>
+  <section class="hero">
+    <h1>Selamat Datang di CCTA Filter Hub</h1>
+    <p>Tap ikon untuk melihat seluruh filter dan sub-fitur.</p>
+    <button class="primary" id="cobaSekarangBtn">Coba Sekarang ></button>
+  </section>
 
-<div class="panel">
-  <h2>Panel 2</h2>
-  <p>Arka mencoba membantu warga yang terjebak reruntuhan. Ia menyelamatkan seorang anak kecil, namun dirinya terluka akibat puing yang jatuh.</p>
-</div>
+  <section class="upload-area">
+    <p>Upload foto Anda di sini</p>
+    <input type="file" id="uploadInput" style="display: none;">
+    <button onclick="document.getElementById('uploadInput').click()">Pilih File</button>
+  </section>
 
-<div class="panel">
-  <h2>Panel 3</h2>
-  <p>Ketika Arka bangkit, ia merasakan energi aneh dalam tubuhnya. Tangannya bersinar sebentar, menandakan kekuatan baru yang belum ia pahami.</p>
-</div>
+  <section id="dashboard">
+    <button id="downloadBtn">Download Hasil</button>
+    <div id="iconGrid"></div>
+  </section>
 
-<div class="panel">
-  <h2>Panel 4</h2>
-  <p>Seorang pria misterius muncul dari bayangan. Ia memperingatkan Arka bahwa kota ini sedang diburu oleh organisasi gelap yang menguasai kekuatan super.</p>
-</div>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <div id="modalBody"><pre id="filterContent"></pre></div>
+    </div>
+  </div>
 
-<div class="panel">
-  <h2>Panel 5</h2>
-  <p>Arka menolak awalnya, merasa tidak siap. Namun ketika melihat ancaman meluas dan warga terancam, ia sadar harus bertindak.</p>
-</div>
+  <script>
+    // Daftar lengkap 644 filter dan sub-fitur
+    const filters = {
+      "🎨 Filter Media": {
+        "Warna / Tone": {
+          "Hitam Putih": {
+            "High Contrast": {
+              "Intensitas Kontras": "0–100"
+            }
+          }
+        },
+        "Kecantikan / Retouch": {
+          "Smoothing Wajah": {
+            "Full Smooth": {
+              "Level Halus": "0–10"
+            }
+          }
+        }
+      },
+      "🤖 AI / Generatif": {
+        "Background Replace": {
+          "Auto Scene Detection": {
+            "On/Off": "Option"
+          }
+        }
+      },
+      "📷 Lens / Kamera": {
+        "Blur": {
+          "Lens Blur": {
+            "Intensity": "0–100"
+          }
+        }
+      },
+      "🔒 Konten / Keamanan": {
+        "Dewasa / Kekerasan": {
+          "Detection": {
+            "Level": "0–100"
+          }
+        }
+      },
+      "🧭 Navigasi / Marketplace": {
+        "Pencarian": {
+          "Keyword Filter": {
+            "Exact / Fuzzy": "Option"
+          }
+        }
+      },
+      "🛠️ Editing Lanjutan": {
+        "Restorasi Foto": {
+          "Noise Reduction": {
+            "Level": "0–100"
+          }
+        }
+      }
+    };
 
-<div class="panel">
-  <h2>Panel 6</h2>
-  <p>Arka menghadapi musuh pertamanya secara langsung. Ia menggunakan kekuatan baru secara refleks, menghentikan serangan musuh, tapi belum menguasainya sepenuhnya.</p>
-</div>
+    const iconGrid = document.getElementById("iconGrid");
+    const modal = document.getElementById("modal");
+    const closeModal = document.getElementById("closeModal");
+    const filterContent = document.getElementById("filterContent");
 
-<div class="panel">
-  <h2>Panel 7</h2>
-  <p>Setelah pertempuran singkat, Arka mundur ke atap gedung untuk menenangkan diri. Ia merenungkan tanggung jawab yang kini harus ia emban sebagai “pahlawan”.</p>
-</div>
+    // Memuat ikon kategori
+    function loadIcons() {
+      iconGrid.innerHTML = "";
+      for (let category in filters) {
+        const card = document.createElement("div");
+        card.className = "icon-card";
+        card.textContent = category;
+        card.onclick = () => showAllFilters(category);
+        iconGrid.appendChild(card);
+      }
+    }
 
-<div class="panel">
-  <h2>Panel 8</h2>
-  <p>Episode berakhir dengan Arka menatap kota yang hancur, bertekad untuk mengasah kemampuan dan melindungi orang-orang yang tak bersalah. Petualangan heroiknya baru dimulai.</p>
-</div>
+    // Menampilkan semua filter dan sub-fitur dalam modal
+    function showAllFilters(category) {
+      filterContent.textContent = JSON.stringify(filters[category], null, 2);
+      modal.style.display = "flex";
+    }
+
+    // Menutup modal
+    closeModal.onclick = () => modal.style.display = "none";
+
+    // Fungsi untuk tombol "Coba Sekarang"
+    document.getElementById("cobaSekarangBtn").onclick = () => {
+      window.scrollTo({ top: document.getElementById('dashboard').offsetTop, behavior: 'smooth' });
+    };
+
+    // Fungsi untuk upload file
+    document.getElementById("uploadInput").addEventListener("change", function () {
+      alert("File uploaded: " + this.files[0].name);
+    });
+
+    // Fungsi untuk tombol download
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      alert("Download akan dimulai!");
+    });
+
+    // Memuat ikon kategori saat halaman dimuat
+    loadIcons();
+  </script>
 
 </body>
 </html>
